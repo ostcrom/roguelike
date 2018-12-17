@@ -31,7 +31,7 @@ def main():
     entities.append(npc)
     key= libtcod.Key()
     mouse = libtcod.Mouse()
-
+    libtcod.console_set_window_title("Dan's Roguelike - " + game_map.map_name)
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
         draw_all(con, entities, game_map, screen_width, screen_height)
@@ -45,13 +45,14 @@ def main():
         if move:
             dx, dy = move
 
-            if not game_map.is_blocked(player.x + dx, player.y + dy):
+            if not game_map.is_blocked(player.x + dx, player.y + dy) and not game_map.is_transport(player.x + dx, player.y + dy):
                 game_map.unblock(player.x, player.y)
                 player.move(dx,dy)
-                if game_map.is_transport(player.x, player.y):
-                    transport = game_map.spaces[player.x][player.y].transport
-                    game_map.switch_map(transport.new_map_index)
-                    player.move(transport.dx, transport.dy)
+            elif game_map.is_transport(player.x + dx, player.y + dy):
+                transport = game_map.spaces[player.x + dx][player.y + dy].transport
+                game_map.switch_map(transport.new_map_index)
+                libtcod.console_set_window_title("Dan's Roguelike - " + game_map.map_name)
+                player.move(dx , dy )
 
 
         if key.vk == libtcod.KEY_ESCAPE:

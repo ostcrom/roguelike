@@ -10,9 +10,11 @@ class GameMap:
         self.spaces = []
         self.transports = []
         self.map_loader = MapLoader(self.width, self.height)
+        self.map_name = ''
 
     def switch_map(self, map_index=0):
         self.spaces = self.map_loader.load_map(map_index)
+        self.map_name = self.map_loader.list_of_map_names[map_index]
 
     def is_blocked(self, x, y):
         if self.spaces[x][y].blocked:

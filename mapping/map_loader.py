@@ -12,10 +12,12 @@ class MapLoader:
             self.height = h
 
             self.list_of_instruction_sets = []
+            self.list_of_map_names = []
             self.list_of_transport_sets = []
             self.spaces = []
             self.build_instruction_set = []
             self.transports = []
+
 
 
             self.build_maps()
@@ -40,8 +42,7 @@ class MapLoader:
         """
         self.level_0()
         self.level_1()
-
-        print(self.list_of_instruction_sets)
+        self.level_2()
 
     def get_instruction_set(self, map_index):
         return self.list_of_instruction_sets[map_index]
@@ -54,11 +55,11 @@ class MapLoader:
         self.transports = []
         self.build_instruction_set = []
 
-    def append_game_map_sets(self):
+    def append_game_map_sets(self, map_name='Map Name'):
         self.list_of_instruction_sets.append(self.build_instruction_set.copy())
         self.list_of_transport_sets.append(self.transports.copy())
-    def unblock(self, x, y):
-        self.spaces[x][y].blocked = False
+        self.list_of_map_names.append(map_name)
+
 
     def dig(self, x, y):
         """
@@ -126,12 +127,7 @@ class MapLoader:
         instructions and transports
         """
 
-        def level_0(self):
-            self.internal_game_map_reset()
-            self.add_room(1,1,5,5)
-            self.add_tunnel_h(5,3,10)
 
-            self.append_game_map_sets()
     """
     The functions below further abstract the process of adding  build instruc-
     tions so it possible to 'build' a map by specifying a series of rooms and
@@ -156,16 +152,22 @@ class MapLoader:
         self.add_room(1,1,5,5)
         self.add_tunnel_h(5,3,10)
         self.add_room(15,1,10,5)
-        self.add_transport_instruction(22,1,0,1,1)
+        self.add_transport_instruction(22,0,0,1,1)
 
-        self.append_game_map_sets()
+        self.append_game_map_sets("Ground Floor")
 
     def level_1(self):
         self.internal_game_map_reset()
-        self.add_transport_instruction(22,1,0,1,0)
+        self.add_transport_instruction(22,0,0,1,0)
         self.add_room(15,1,10,5)
         self.add_tunnel_v(20,6,10)
         self.add_room(15,16,10,10)
+        self.add_transport_instruction(20,26,0,1,2)
 
+        self.append_game_map_sets("Basement")
+    def level_2(self):
+        self.internal_game_map_reset()
+        self.add_room(15,16,10,10)
 
-        self.append_game_map_sets()
+        self.add_transport_instruction(20,26,0,-1,1)
+        self.append_game_map_sets("Basement")
