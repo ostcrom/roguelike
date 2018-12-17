@@ -5,6 +5,7 @@ from input_handler import handle_keys
 from render_functions import clear_all, draw_all
 from mapping.game_map import GameMap
 from mapping.space import Space
+from mapping.transport import Transport
 
 screen_width = 80
 screen_height = 50
@@ -20,11 +21,11 @@ def main():
     con = libtcod.console_new(screen_width, screen_height)
 
     game_map = GameMap(map_width, map_height)
-    game_map.init_spaces()
+    game_map.switch_map(0)
 
 
     entities = []
-    player = GameObject(int(screen_width/2), int(screen_height /2), '@', libtcod.white, "Hero", True)
+    player = GameObject(3, 3, '@', libtcod.white, "Hero", True)
     npc = GameObject(int(screen_width / 2 - 5), int(screen_height / 2), '@', libtcod.yellow, "Bad Guy", True)
     entities.append(player)
     entities.append(npc)
@@ -47,8 +48,10 @@ def main():
             if not game_map.is_blocked(player.x + dx, player.y + dy):
                 game_map.unblock(player.x, player.y)
                 player.move(dx,dy)
-                if game_map.is_transport:
-                    pass
+                if game_map.is_transport(player.x, player.y):
+                    transport = game_map.spaces[player.x][player.y].transport
+                    game_map.switch_map(transport.new_map_index)
+                    player.move(transport.dx, transport.dy)
 
 
         if key.vk == libtcod.KEY_ESCAPE:

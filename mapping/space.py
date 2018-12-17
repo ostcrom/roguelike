@@ -1,3 +1,5 @@
+from mapping.transport import Transport
+
 class Space:
     """
     A space on the map. May or may not be blocked/block sightself.
@@ -19,3 +21,5 @@ class Space:
         self.discovered = False
         if not transport is None:
             self.transport = transport
+        else:
+            self.transport = None

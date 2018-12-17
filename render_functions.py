@@ -2,7 +2,8 @@ import libtcodpy as libtcod
 
 colors = {
         'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150)
+        'dark_ground': libtcod.Color(50, 50, 150),
+        'transport_green': libtcod.lime
 }
 
 def draw_entity(con, entity):
@@ -19,6 +20,8 @@ def draw_all(con, entities, game_map, screen_width, screen_height):
 
             if wall:
                 libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
+            elif not game_map.spaces[x][y].transport is None:
+                libtcod.console_set_char_background(con, x, y, colors.get('transport_green'), libtcod.BKGND_SET)
             else:
                 libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
 
