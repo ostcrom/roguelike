@@ -7,6 +7,7 @@ from mapping.game_map import GameMap
 from mapping.space import Space
 from mapping.transport import Transport
 
+game_title = "StrangeHack"
 screen_width = 80
 screen_height = 50
 map_width=100
@@ -25,7 +26,7 @@ def main():
     game_map.switch_map(0)
 
     fov_recomputer = True
-    
+
 
     entities = []
     player = GameObject(3, 3, '@', libtcod.white, "Hero", True)
@@ -54,7 +55,7 @@ def main():
             elif game_map.is_transport(player.x + dx, player.y + dy):
                 transport = game_map.spaces[player.x + dx][player.y + dy].transport
                 game_map.switch_map(transport.new_map_index)
-                libtcod.console_set_window_title("Dan's Roguelike - " + game_map.map_name)
+                libtcod.console_set_window_title( game_title + " - " + game_map.map_name)
                 player.move(dx , dy )
                 player.move(transport.dx, transport.dy)
 
