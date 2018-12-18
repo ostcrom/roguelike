@@ -1,6 +1,7 @@
 from mapping.space import Space
 from mapping.map_loader import MapLoader
 from mapping.transport import Transport
+from game_object import GameObject
 
 class GameMap:
     def __init__(self,w,h):

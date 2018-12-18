@@ -1,6 +1,7 @@
 from mapping.space import Space
 from mapping.transport import Transport
 
+
 class MapLoader:
     def __init__(self, w, h):
             """
@@ -17,8 +18,6 @@ class MapLoader:
             self.spaces = []
             self.build_instruction_set = []
             self.transports = []
-
-
 
             self.build_maps()
 
@@ -162,7 +161,7 @@ class MapLoader:
         self.add_room(15,1,10,5)
         self.add_tunnel_v(20,6,10)
         self.add_room(15,16,10,10)
-        self.add_transport_instruction(20,26,0,1,2)
+        self.add_transport_instruction(20,26,0,-1,2)
 
         self.append_game_map_sets("Basement")
     def level_2(self):

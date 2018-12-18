@@ -11,7 +11,8 @@ screen_width = 80
 screen_height = 50
 map_width=100
 map_height = 100
-
+fov_algorithm = 0
+fov_light_walls = True
 
 def main():
 
@@ -23,6 +24,8 @@ def main():
     game_map = GameMap(map_width, map_height)
     game_map.switch_map(0)
 
+    fov_recomputer = True
+    
 
     entities = []
     player = GameObject(3, 3, '@', libtcod.white, "Hero", True)
@@ -53,6 +56,7 @@ def main():
                 game_map.switch_map(transport.new_map_index)
                 libtcod.console_set_window_title("Dan's Roguelike - " + game_map.map_name)
                 player.move(dx , dy )
+                player.move(transport.dx, transport.dy)
 
 
         if key.vk == libtcod.KEY_ESCAPE:
