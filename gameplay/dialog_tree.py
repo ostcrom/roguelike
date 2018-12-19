@@ -1,22 +1,24 @@
 import json
+import operator
+
 
 test_dict = {"main":{
-    "say": ["Hi there this top level dialogue!"],
-    "response":[{"say":"Thank you! Whats next?", "target_dialogue":"answer_happy"},
-            {"say":"Get that corn outta my face!", "target_dialogue":"answer_indignant"},
-            {"say":"Can I have the dialog tutorial?","target_dialogue":"example_dialog"}],
+    "say": "Hi there this top level dialog!",
+    "response":[{"say":"Thank you! Whats next?", "target_dialog":"answer_happy"},
+            {"say":"Get that corn outta my face!", "target_dialog":"answer_indignant"},
+            {"say":"Can I have the dialog tutorial?","target_dialog":"example_dialog"}],
     },
     "answer_happy":{
         "say":["Well, how about I invite you to my finished basement apartment,",
         "located conveniently under my parents house. I have imitation",
         "crab meat to share!"],
         "emote":["You back away slowly."],
-        "target_dialogue":"exit"
+        "target_dialog":"exit"
     },
     "answer_indignant":{
         "say":["If the elastic hadn't broken in my stretchy pants, I would",
         "kick your ass."],
-        "target_dialogue":"exit"
+        "target_dialog":"exit"
     },
 
     "example_dialog":{
@@ -25,53 +27,49 @@ test_dict = {"main":{
                 "are processed in, which is respective to the order found",
                 "within this code. IE: The 'say' key is processed first,",
                 "followed by the response key."],
-        "response":[{"say":"I think that makes sense.", "target_dialogue":"answer_happy"},
-                    {"say":"I like turtles and nested json objects", "target_dialogue":"answer_indignant"}]
+        "response":[{"say":"I think that makes sense.", "target_dialog":"answer_happy"},
+                    {"say":"I like turtles and nested json objects", "target_dialog":"answer_indignant"}]
     }
 }
 
-class DialogueTree:
+class DialogTree:
 
-    def __init__(self,dialogue_dict):
-        self.dialogue_dict = dialogue_dict
-        self.dialogue = {}
+    def __init__(self,dialog_dict):
+        self.dialog_dict = dialog_dict
+        self.dialog = {}
 
-        self.load_dialogue('main')
-
-    def load_dialogue(self, dialogue_name):
+    def load_dialog(self, dialog_name):
         ##TODO Scriptable interface probably needs robust input checking.
-        if dialogue_name == 'exit':
+        if dialog_name == 'exit':
             return
 
-        dialogue = self.dialogue_dict[dialogue_name]
+        dialog = self.dialog_dict[dialog_name]
 
-        if 'say' in dialogue:
-            for line in dialogue['say']:
-                print (line)
+        if 'say' in dialog:
+            self.say_line (dialog['say'])
 
-        if 'response' in dialogue:
-            responses = dialogue['response']
+        if 'response' in dialog:
+            responses = dialog['response']
             num_responses = len(responses)
             print ('')
             player_select = 1
-            
+
             for response in responses:
                 if 'say' in response:
-                     print(str(player_select) +".  - " +response['say'])
+                     self.say(str(player_select) +".  - " +response['say'])
                 player_select += 1
 
             selection_index = self.get_reply(num_responses, 1)
 
-            if 'target_dialogue' in responses[selection_index]:
-                self.load_dialogue(responses[selection_index]['target_dialogue'])
+            if 'target_dialog' in responses[selection_index]:
+                self.load_dialog(responses[selection_index]['target_dialog'])
 
-        if 'emote' in dialogue:
-            for line in dialogue['emote']:
-                print("*** "+ line +" ***")
+        if 'emote' in dialog:
+                self.say("*** "+ dialog['emote'] +" ***")
 
-        if 'target_dialogue' in dialogue:
-            target_dialogue = dialogue['target_dialogue']
-            self.load_dialogue(target_dialogue)
+        if 'target_dialog' in dialog:
+            target_dialog = dialog['target_dialog']
+            self.load_dialog(target_dialog)
 
     def get_reply(self, num_responses, tries):
         if tries == 1:
@@ -87,4 +85,9 @@ class DialogueTree:
             return selection - 1;
         else:
             return self.get_reply(num_responses, tries + 1)
-DialogueTree(test_dict)
+    ##Methods to be super imposed by inheriting object.
+    def say(self, line):
+        print(line)
+
+    def reply_line(self,line):
+        print(line)

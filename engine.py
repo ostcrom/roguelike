@@ -6,12 +6,19 @@ from render_functions import clear_all, draw_all
 from mapping.game_map import GameMap
 from mapping.space import Space
 from mapping.transport import Transport
+from gameplay.dialog_prompt import DialogPrompt
 
 game_title = "StrangeHack"
 screen_width = 80
 screen_height = 50
-map_width=100
-map_height = 100
+map_width=40
+map_height = 40
+dialog_width = 40
+dialog_height = 20
+dialog_pos_x = 40
+dialog_pos_y = 21
+
+
 fov_algorithm = 0
 fov_light_walls = True
 
@@ -21,6 +28,7 @@ def main():
 
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
     con = libtcod.console_new(screen_width, screen_height)
+    dialog_prompt = DialogPrompt(con, dialog_width, dialog_height, dialog_pos_x, dialog_pos_y)
 
     game_map = GameMap(map_width, map_height)
     game_map.switch_map(0)
@@ -41,6 +49,8 @@ def main():
         draw_all(con, entities, game_map, screen_width, screen_height)
         libtcod.console_flush()
         clear_all(con, entities)
+        if key.c == ord('a'):
+            dialog_prompt.load_dialog('main')
         action = handle_keys(key)
 
         move = action.get('move')
@@ -63,9 +73,6 @@ def main():
         if key.vk == libtcod.KEY_ESCAPE:
             return True
         game_map.update_blocked(entities)
-
-def load_game():
-    print('hi')
 
 if __name__ == '__main__':
      main()

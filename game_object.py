@@ -1,4 +1,3 @@
-from mapping.game_map import GameMap
 
 class GameObject:
     """
