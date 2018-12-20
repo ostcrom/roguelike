@@ -56,7 +56,7 @@ class DialogTree:
 
             for response in responses:
                 if 'say' in response:
-                     self.say(str(player_select) +".  - " +response['say'])
+                     self.say_line(str(player_select) +".  - " +response['say'])
                 player_select += 1
 
             selection_index = self.get_reply(num_responses, 1)
@@ -65,7 +65,7 @@ class DialogTree:
                 self.load_dialog(responses[selection_index]['target_dialog'])
 
         if 'emote' in dialog:
-                self.say("*** "+ dialog['emote'] +" ***")
+                self.say_line("*** "+ dialog['emote'] +" ***")
 
         if 'target_dialog' in dialog:
             target_dialog = dialog['target_dialog']
@@ -86,7 +86,7 @@ class DialogTree:
         else:
             return self.get_reply(num_responses, tries + 1)
     ##Methods to be super imposed by inheriting object.
-    def say(self, line):
+    def say_line(self, line):
         print(line)
 
     def reply_line(self,line):

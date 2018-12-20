@@ -13,8 +13,8 @@ screen_width = 80
 screen_height = 50
 map_width=40
 map_height = 40
-dialog_width = 40
-dialog_height = 20
+dialog_width = 80
+dialog_height = 35
 dialog_pos_x = 40
 dialog_pos_y = 21
 
@@ -43,7 +43,7 @@ def main():
     entities.append(npc)
     key= libtcod.Key()
     mouse = libtcod.Mouse()
-    libtcod.console_set_window_title("Dan's Roguelike - " + game_map.map_name)
+    libtcod.console_set_window_title(game_title+ " - " + game_map.map_name)
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
         draw_all(con, entities, game_map, screen_width, screen_height)

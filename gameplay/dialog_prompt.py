@@ -1,6 +1,7 @@
 import libtcodpy as libtcod
 import textwrap
 from gameplay.dialog_tree import DialogTree
+from ui import PromptHelper
 
 test_dict = {"main":{
     "say": "Hi there this top level dialog!",
@@ -32,30 +33,43 @@ class DialogPrompt(DialogTree):
         self.target_con = target_con
         self.target_pos_x = target_pos_x
         self.target_pos_y = target_pos_y
+        self.height = height
+        self.width = width
+        self.prompt_helper = PromptHelper(self.dialog_con, self.height, self.width, target_pos_x, target_pos_y, target_con)
+
+        ##Set text line width to our prompt width minus a 10% margin.
         self.wrapper = textwrap.TextWrapper(width - width / 10 )
 
+
     def say_line(self, line_to_say):
+
+
         message = ''
         lines = self.wrapper.wrap(line_to_say)
 
+        ##textwrapper returns an array of lines, None if empty.
+        if lines is None:
+            return
+        ##Concatenate an array into a single string with line breaks.
         for line in lines:
             message += line + "\r\n"
 
-        libtcod.console_print_ex(self.dialog_con, 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, message )
-        libtcod.console_blit(self.dialog_con,0,0,0,0,self.target_con, self.target_pos_x, self.target_pos_y)
-        libtcod.console_flush()
+        self.prompt_helper.set_text(message)
+        self.prompt_helper.update()
 
     def unload(self):
         self.dialog_con.consoloe_delete()
 
     def get_reply(self, num_responses, tries):
+        prompt_text = ''
         if tries == 1:
-            print ("Select reply:")
+            prompt_text += "Select reply:\r\n"
         elif tries <= 3:
-            print ("Please select a response: 1 - " + str(num_responses))
+            prompt_text += "Please select a response: 1 - " + str(num_responses)+ "\r\n"
         else:
             return 0
-        selection = self.GetInput()
+        self.prompt_helper.set_text(prompt_text, True)
+        selection = self.GetChoice()
         print(selection)
 
         if isinstance(selection,int) and not selection < 1 and not selection > num_responses:
@@ -64,7 +78,7 @@ class DialogPrompt(DialogTree):
             return selection - 1;
         else:
             return self.get_reply(num_responses, tries + 1)
-    def GetInput(self):
+    def GetChoice(self):
         command = ''
         key = libtcod.console_wait_for_keypress(True)
         while key.vk != libtcod.KEY_ENTER:
