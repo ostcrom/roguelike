@@ -36,3 +36,12 @@ class GameMap:
 
     def unblock(self, x, y):
         self.spaces[x][y].blocked = False
+
+    def get_game_object(self, x, y, game_objects):
+        ##returns a game object if one exists at given coordinates,
+        ##otherwise returns None. Brute force search through entities.
+        for object in game_object:
+            if object.x == x and object.y == y:
+                return object
+
+        return None

@@ -5,6 +5,8 @@ from message_log import MessageLog
 from game_object import GameObject
 from render_functions import draw_all, draw_map
 from input_handler import handle_keys
+from utils import test_dict, map_npc_db
+from gameplay.npc import NPC
 
 game_title = "StrangeHack"
 screen_width = 120
@@ -85,6 +87,43 @@ def npc_dialog(dialog_tree, dialog_name):
     if dialog_tree.dialog_exists(target):
         npc_dialog(dialog_tree, target)
 
+def load_map(terminal, player, objects, map, new_map_index=0, dx=0, dy=0, transport=None):
+    map.switch_map(transport.new_map_index)
+    draw_map(terminal, map)
+    game_map.unblock(player.x, player.y)
+    player.move(dx , dy )
+    player.move(transport.dx, transport.dy)
+
+    objects.clear()
+    objects.append(player)
+
+    if map.map_name in map_npc_db:
+        load_objects = map_npc_db[map.map_name]
+
+        for key in load_objects.keys():
+            objects.append(init_object(load_objects[key], key))
+
+
+
+def init_object(o, name):
+    if not 'x' in o:
+        o['x'] = 0
+    if not 'y' in o:
+        o['y'] = 0
+    if not 'char' in o:
+        o['char'] = '@'
+    if not 'color' in o:
+        o['color'] = 'white'
+
+    if not 'type' in o:
+        return GameObject(o['x'], o['y'], o['char'], o['color'], name)
+    elif o.get('type') == 'npc':
+        if 'dialog' in o:
+            dialog = o['dialog']
+        else:
+            dialog = 'default'
+        return NPC(o['x'], o['y'], o['char'], o['color'], name, dialog)
+
 ##TODO: abstract, automate init
 terminal.open()
 terminal.printf(1, 1, 'Hello, world!')
@@ -98,15 +137,24 @@ run = True
 ml = MessageLog(dialog_width, dialog_height)
 test_count = 0
 
-game_entities = []
+game_objects = []
 dialog_entities = []
+
+
 player = GameObject(3, 3, '@', 'red', "Hero", True)
-game_entities.append(player)
+
+##Keep track of which direction player is pointing, start up.
+player.last_dx = 0
+player.last_dy = -1
+game_objects.append(player)
+
+
+
 game_map = GameMap(map_width,map_height)
 game_map.switch_map()
-game_map.update_blocked(game_entities)
+game_map.update_blocked(game_objects)
 draw_map(terminal, game_map)
-draw_all(terminal, game_entities, map_width, map_height)
+draw_all(terminal, game_objects, map_width, map_height)
 terminal.refresh()
 while run:
     action = None
@@ -124,7 +172,12 @@ while run:
             ##BS test functions for the moment.
             ### TODO: remove da bs
         elif action == terminal.TK_A:
-            ml.log_message("You pressed key! Lorem ipsum dolor sit amet, consectetur adipiscing el" + str(test_count))
+            get_object = game_map.get_game_object(player.x + player.last_dx, player.y + player.last_dy, game_objects)
+
+            if not get_object is None:
+                if isinstance(get_object, NPC):
+                    if not get_object['dialog'] is None:
+                        npc_dialog(get_object['dialog'], "main")
 
 
         elif action == terminal.TK_S:
@@ -140,21 +193,17 @@ while run:
             new_x = player.x + dx
             new_y = player.y + dy
             if game_map.is_transport(new_x, new_y):
-
                 transport = game_map.spaces[new_x][new_y].transport
-                game_map.switch_map(transport.new_map_index)
-                draw_map(terminal, game_map)
-
-                game_map.unblock(player.x, player.y)
-                player.move(dx , dy )
-                player.move(transport.dx, transport.dy)
+                load_map(terminal, player, game_objects, game_map, transport.new_map_index, dx, dy, transport)
             elif not game_map.is_blocked(new_x,new_y):
                 game_map.unblock(player.x, player.y)
                 player.move(dx,dy)
 
+            player.last_dx = dx
+            player.lasty_dy = dy
         test_count += 1
 
-        draw_all(terminal, game_entities, map_width, map_height)
+        draw_all(terminal, game_objects, map_width, map_height)
         updateui()
 
 

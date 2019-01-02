@@ -169,4 +169,4 @@ class MapLoader:
         self.add_room(15,16,10,10)
 
         self.add_transport_instruction(20,26,0,-1,1)
-        self.append_game_map_sets("Basement")
+        self.append_game_map_sets("Basement 2")

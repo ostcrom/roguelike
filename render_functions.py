@@ -20,7 +20,6 @@ def draw_map(terminal, game_map):
             transport = game_map.is_transport(x,y)
 
             if wall and not transport:
-                print('dink')
                 terminal.color('blue')
                 terminal.put(x,y,BLOCK)
                 ##libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
