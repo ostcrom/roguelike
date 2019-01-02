@@ -1,36 +1,53 @@
-import libtcodpy as libtcod
+from bearlibterminal import terminal
 
-colors = {
-        'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150),
-        'transport_green': libtcod.lime
-}
+FLOOR_LAYER = 0
+MAP_LAYER = 1
+ENTITY_LAYER = 2
+UI_LAYER = 3
+BLOCK = "█"
 
-def draw_entity(con, entity):
-    libtcod.console_set_default_foreground(con, entity.color)
-    libtcod.console_put_char(con, entity.x, entity.y, entity.char, libtcod.BKGND_NONE)
+def draw_entity(terminal, entity):
+    terminal.layer(ENTITY_LAYER)
+    terminal.color(entity.color)
+    terminal.put(entity.x, entity.y, entity.char)
 
-def clear_entity(con, entity):
-    libtcod.console_put_char(con, entity.x, entity.y, ' ', libtcod.BKGND_NONE)
-
-def draw_all(con, entities, game_map, screen_width, screen_height):
+def draw_map(terminal, game_map):
+    terminal.layer(MAP_LAYER)
+    clear_layer(terminal,MAP_LAYER,game_map.width, game_map.height)
     for y in range(game_map.height):
         for x in range(game_map.width):
             wall = game_map.spaces[x][y].block_sight
             transport = game_map.is_transport(x,y)
 
             if wall and not transport:
-                libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
+                print('dink')
+                terminal.color('blue')
+                terminal.put(x,y,BLOCK)
+                ##libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
             elif transport:
-                libtcod.console_set_char_background(con, x, y, colors.get('transport_green'), libtcod.BKGND_SET)
+                terminal.color('green')
+                terminal.put(x,y,BLOCK)
+                ##libtcod.console_set_char_background(con, x, y, colors.get('transport_green'), libtcod.BKGND_SET)
             else:
-                libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
+                terminal.color('white')
+                terminal.put(x,y,BLOCK)
+                ##libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
 
+
+def draw_all(terminal, entities, w, h):
+
+    clear_layer(terminal, ENTITY_LAYER, w, h)
     for entity in entities:
-        draw_entity(con, entity)
+        draw_entity(terminal, entity)
 
-    libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
-def clear_all(con, entities):
-    for entity in entities:
-        clear_entity(con, entity)
+def clear_layer(terminal, layer, w, h):
+    terminal.layer(layer)
+    terminal.clear_area(0,0,w,h)
+
+def ui_print(terminal, x, y, h, w, text_string):
+
+    terminal.layer(UI_LAYER)
+    terminal.clear_area(dialog_pos_x,dialog_pos_y,dialog_width,dialog_height)
+    terminal.printf(dialog_pos_x,dialog_pos_y,ml.get_scroll_back())
+    terminal.refresh()
