@@ -5,7 +5,7 @@ from message_log import MessageLog
 from game_object import GameObject
 from render_functions import draw_all, draw_map
 from input_handler import handle_keys
-from utils import test_dict, map_npc_db
+from utils import test_dict, map_npc_db, lorem
 from gameplay.npc import NPC
 
 game_title = "StrangeHack"
@@ -77,7 +77,6 @@ def npc_dialog(dialog_tree, dialog_name):
                 if not selected_response is None and selected_response >= 0 and selected_response < response_count:
                     ##Subtract one from selection because count starts at 1 not 0
                     target = responses[selected_response - 1]["target_dialog"]
-                    print(target)
                 else:
                     ml.log_message("Select a response from 1 to " + str(response_count -1 ))
             else:
@@ -113,7 +112,7 @@ def init_object(o, name):
     if not 'char' in o:
         o['char'] = '@'
     if not 'color' in o:
-        o['color'] = 'white'
+        o['color'] = 'black'
 
     if not 'type' in o:
         return GameObject(o['x'], o['y'], o['char'], o['color'], name)
@@ -129,9 +128,6 @@ terminal.open()
 terminal.printf(1, 1, 'Hello, world!')
 terminal.refresh()
 terminal.set("window: size="+str(screen_width)+"x"+str(screen_height)+";")
-
-##🚧Debug garbage. 🚧
-lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 run = True
 ml = MessageLog(dialog_width, dialog_height)
@@ -173,11 +169,14 @@ while run:
             ### TODO: remove da bs
         elif action == terminal.TK_A:
             get_object = game_map.get_game_object(player.x + player.last_dx, player.y + player.last_dy, game_objects)
+            print(str(player.x + player.last_dx) +" "+ str(player.y + player.last_dy))
 
             if not get_object is None:
+                print(str(get_object))
                 if isinstance(get_object, NPC):
-                    if not get_object['dialog'] is None:
-                        npc_dialog(get_object['dialog'], "main")
+                    if not get_object.dialog_dict is None:
+                        dialog_tree = DialogTree(get_object.dialog_dict)
+                        npc_dialog(dialog_tree, "main")
 
 
         elif action == terminal.TK_S:
@@ -200,7 +199,7 @@ while run:
                 player.move(dx,dy)
 
             player.last_dx = dx
-            player.lasty_dy = dy
+            player.last_dy = dy
         test_count += 1
 
         draw_all(terminal, game_objects, map_width, map_height)

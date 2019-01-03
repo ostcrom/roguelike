@@ -40,8 +40,9 @@ class GameMap:
     def get_game_object(self, x, y, game_objects):
         ##returns a game object if one exists at given coordinates,
         ##otherwise returns None. Brute force search through entities.
-        for object in game_object:
+        for object in game_objects:
             if object.x == x and object.y == y:
+                print(object.name)
                 return object
 
         return None

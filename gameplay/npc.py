@@ -4,7 +4,7 @@ from utils import npc_dialog_db
 
 class NPC(GameObject):
     def __init__(self, x, y, char, color, name, dialog_name='default'):
-        super().__init__(self, x, y, char, color, name, True)
+        super().__init__(x, y, char, color, name, True)
         self.dialog_dict = {}
         self.load_dialog(dialog_name)
     def load_dialog(self, dialog_name):
