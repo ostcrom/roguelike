@@ -1,3 +1,5 @@
+import operator
+
 def color_tag_string(color):
     return "[color="+color+"]"
 
@@ -7,7 +9,11 @@ test_dict = {
     "response":[{"say":"Thank you! Whats next?", "target_dialog":"answer_happy"},
             {"say":"Get that corn outta my face!", "target_dialog":"answer_indignant"},
             {"say":"Can I have the dialog tutorial?","target_dialog":"example_dialog"}],
-    "target_dialog":"example_dialog"
+    "target_dialog":"example_dialog",
+    "conditions" : [
+        {"condition_string" : "item = Goblet",
+            "failed_target_dialog" : "falied1"}
+    ]
     },
     "answer_happy":{
         "say":"Well, how about I invite you to my finished basement apartment, located conveniently under my parents house. I have imitation crab meat to share!",
@@ -24,6 +30,10 @@ test_dict = {
         "response":[{"say":"I think that makes sense.", "target_dialog":"answer_happy"},
                     {"say":"I like turtles and nested json objects", "target_dialog":"answer_indignant"}],
         "target_dialog":"answer_happy"
+    },
+    "failed1" : {
+        "say" : "You don't look like a hero to me!",
+        "target_dialog" : "exit"
     }
 }
 
@@ -42,12 +52,21 @@ lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
 
 
 map_npc_db = {
-    "Ground Floor":{},
-    "Basement":{"Danny Davis":{
+    "Basement":{},
+    "Ground Floor":{"Danny Davis":{
     "type" : "npc",
-    "x" :17,
-    "y": 21,
+    "x" :6,
+    "y": 3,
     "dialog":"default"
     }},
     "Basement 2":{}
 }
+
+## https://stackoverflow.com/questions/18591778/how-to-pass-an-operator-to-a-python-function
+def get_truth(first_var, operator_symbol, second_var):
+    ops = {'>': operator.gt,
+           '<': operator.lt,
+           '>=': operator.ge,
+           '<=': operator.le,
+           '=': operator.eq}
+    return ops[operator_symbol](first_var, second_var)
