@@ -5,9 +5,10 @@ from message_log import MessageLog
 from game_object import GameObject
 from render_functions import draw_all, draw_map
 from input_handler import handle_keys
-from utils import test_dict, map_npc_db, lorem, get_truth
+from utils import *
 from gameplay.npc import NPC
 from gameplay.inventory import InventoryItem
+import re
 
 game_title = "StrangeHack"
 screen_width = 120
@@ -55,7 +56,6 @@ def selection_to_int(selection):
     else:
         return None
 
-
 def dialog_condition_check(condition_code_string, char1, char2):
     code_string_stack = condition_code_string.split(" ")
     ##OK, so here's the deal.
@@ -76,9 +76,9 @@ def dialog_condition_check(condition_code_string, char1, char2):
         ##the third pos is whatever bits are remaining (to be split again later maybe)
         ##join it
         condition_str = str.join(" ", code_string_stack)
-        print(trigger_var_str)
-        print(operator_str)
-        print(condition_str)
+        ##print(trigger_var_str)
+        ##print(operator_str)
+        ##print(condition_str)
     except:
         print("Couldn't  parse condition string.")
         return False
@@ -86,12 +86,31 @@ def dialog_condition_check(condition_code_string, char1, char2):
         ##Special case to check inventory items...
     if trigger_var_str == 'item':
         inventory = getattr(player, 'inventory', None)
-        for item in inventory:
-            print(item)
-        if condition_str in inventory:
-            return True
+
+        quote_check_regex_arr = re.findall(r"\"(.*?)\"", condition_str, re.DOTALL)
+        if len(quote_check_regex_arr) > 0:
+            item_name = quote_check_regex_arr.pop()
+
+            ##there might be an integer left at the end to specify quantity...
+            try:
+                quantity_str = condition_str.replace('"'+item_name+'"','').split(' ').pop()
+                quantity_int = int(quantity_str)
+            except:
+                quantity_int = 1
+
+            ##print(quantity_int)
+            ##print(item_name)
+
+        if not inventory is None:
+            return check_inventory_for_item(inventory, item_name, quantity_int)
         else:
             return False
+        # for item in inventory:
+        #     print(item)
+        # if condition_str in inventory:
+        #     return True
+        # else:
+        #     return False
         ##Need to add extra conditions to check item quantity.
 
     try:
@@ -99,7 +118,6 @@ def dialog_condition_check(condition_code_string, char1, char2):
     except:
         print("Couldn't get player attribute " + trigger_var_str)
         return False
-    print("Returning THE truth!")
     return get_truth(trigger, operator_str, condition_str)
 
 def npc_dialog(npc, player, dialog_name):
@@ -116,8 +134,8 @@ def npc_dialog(npc, player, dialog_name):
             exit = not dialog_condition_check(condition['condition_string'], player, npc)
         if exit:
             return False
-
-    ml.log_message(text)
+    text =  text
+    ml.log_message(text, npc.color)
     if not responses is None:
         response_count = 1
         for response in responses:
@@ -144,7 +162,7 @@ def npc_dialog(npc, player, dialog_name):
             updateui()
 
     if dialog_tree.dialog_exists(target):
-        npc_dialog(dialog_tree, player,  target)
+        npc_dialog(npc, player,  target)
 
 def load_map(terminal, player, objects, map, new_map_index=0, dx=0, dy=0):
     map.switch_map(new_map_index)
@@ -169,7 +187,16 @@ def add_to_inventory(inventory, item_to_add):
     else:
         item_in_inventory.quantity += item_to_add.quantity
 
-
+def check_inventory_for_item(inventory, item_name, minimum_quantity = 1):
+        if item_name in inventory:
+            print(item_name + "qty:")
+            print(inventory[item_name].quantity)
+            if inventory[item_name].quantity >= minimum_quantity:
+                return True
+            else:
+                return False
+        else:
+            return False
 
 def init_object(o, name):
     if not 'x' in o:
@@ -213,6 +240,7 @@ player.last_dy = -1
 game_objects.append(player)
 
 add_to_inventory(player.inventory, InventoryItem("Goblet"))
+add_to_inventory(player.inventory, InventoryItem("Replacement Plugs", 11))
 
 
 game_map = GameMap(map_width,map_height)
@@ -240,13 +268,12 @@ while run:
             ### TODO: remove da bs
         elif action == terminal.TK_A:
             get_object = game_map.get_game_object(player.x + player.last_dx, player.y + player.last_dy, game_objects)
-            print(str(player.x + player.last_dx) +" "+ str(player.y + player.last_dy))
+            ##print(str(player.x + player.last_dx) +" "+ str(player.y + player.last_dy))
 
             if not get_object is None:
-                print(str(get_object))
+                ##print(str(get_object))
                 if isinstance(get_object, NPC):
                     if not get_object.dialog_dict is None:
-                        dialog_tree = DialogTree(get_object.dialog_dict)
                         npc_dialog(get_object, player, "main")
 
 

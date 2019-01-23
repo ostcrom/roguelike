@@ -11,7 +11,7 @@ test_dict = {
             {"say":"Can I have the dialog tutorial?","target_dialog":"example_dialog"}],
     "target_dialog":"example_dialog",
     "conditions" : [
-        {"condition_string" : "item = Goblet",
+        {"condition_string" : """item = "Replacement Plugs" 10""",
             "failed_target_dialog" : "falied1"}
     ]
     },
@@ -57,7 +57,8 @@ map_npc_db = {
     "type" : "npc",
     "x" :6,
     "y": 3,
-    "dialog":"default"
+    "dialog":"default",
+    "color" : "blue"
     }},
     "Basement 2":{}
 }
